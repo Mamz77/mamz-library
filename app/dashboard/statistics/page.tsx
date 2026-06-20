@@ -117,7 +117,7 @@ export default async function StatisticsPage() {
               .sort((a, b) => b.percentage - a.percentage)
               .slice(0, 10)
               .map((p, i) => {
-                const book = p.book as { title: string } | null;
+                const book = Array.isArray(p.book) ? p.book[0] as { title: string } | null : p.book as { title: string } | null;
                 return (
                   <div key={i} className="flex items-center gap-3">
                     <div className="w-5 text-xs text-muted-foreground text-center">
