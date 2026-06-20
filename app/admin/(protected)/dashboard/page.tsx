@@ -48,7 +48,7 @@ const bookCounts: Record<
 (topBooksRaw || []).forEach((e) => {
   if (!e.book_id || !Array.isArray(e.books) || !e.books.length) return;
 
-  const book = Array.isArray(p.book) ? p.book[0] : null;
+  const book = Array.isArray(p.book) ? e.books[0] : null;
 
   if (!book) return;
 
