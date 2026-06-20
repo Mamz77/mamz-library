@@ -25,19 +25,50 @@ async function getDashboardStats() {
   ]);
 
   const { data: topBooksRaw } = await supabase
-    .from("analytics_events")
-    .select("book_id, books(id, title, author, cover_url, slug)")
-    .eq("event_type", "read_start")
-    .not("book_id", "is", null)
-    .limit(100);
+  .from("analytics_events")
+  .select("book_id, books(id, title, author, cover_url, slug)")
+  .eq("event_type", "read_start")
+  .not("book_id", "is", null)
+  .limit(100);
 
-  const bookCounts: Record<string, { count: number; book: unknown }> = {};
-  (topBooksRaw || []).forEach((e: { book_id: string | null; books: unknown }) => {
-    if (!e.book_id || !e.books) return;
-    if (!bookCounts[e.book_id]) bookCounts[e.book_id] = { count: 0, book: e.books };
-    bookCounts[e.book_id].count++;
-  });
-  const topBooks = Object.values(bookCounts).sort((a, b) => b.count - a.count).slice(0, 5);
+const bookCounts: Record<
+  string,
+  {
+    count: number;
+    book: {
+      id: string;
+      title: string;
+      author: string;
+      cover_url?: string;
+      slug: string;
+    } | null;
+  }
+> = {};
+
+(topBooksRaw || []).forEach((e) => {
+  if (!e.book_id || !Array.isArray(e.books) || !e.books.length) return;
+
+  const book = e.books[0];
+
+  if (!bookCounts[e.book_id]) {
+    bookCounts[e.book_id] = {
+      count: 0,
+      book: {
+        id: book?.id || "",
+        title: book?.title || "",
+        author: book?.author || "",
+        cover_url: book?.cover_url,
+        slug: book?.slug || "",
+      },
+    };
+  }
+
+  bookCounts[e.book_id].count++;
+});
+
+const topBooks = Object.values(bookCounts)
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 10);
 
   const { data: dailyEvents } = await supabase
     .from("analytics_events")
