@@ -24,11 +24,24 @@ export default async function AdminAnalyticsPage() {
     .limit(200);
 
   const viewCounts: Record<string, { count: number; title: string; author: string }> = {};
-  (viewEvents || []).forEach((e: { book_id: string | null; books: { title?: string; author?: string } | null }) => {
-    if (!e.book_id || !e.books) return;
-    if (!viewCounts[e.book_id]) viewCounts[e.book_id] = { count: 0, title: e.books.title || "", author: e.books.author || "" };
-    viewCounts[e.book_id].count++;
-  });
+(viewEvents || []).forEach((e: {
+  book_id: string | null;
+  books: { title: string; author: string }[] | null;
+}) => {
+  if (!e.book_id || !e.books?.length) return;
+
+  const book = e.books[0];
+
+  if (!viewCounts[e.book_id]) {
+    viewCounts[e.book_id] = {
+      count: 0,
+      title: book?.title || "",
+      author: book?.author || ""
+    };
+  }
+
+  viewCounts[e.book_id].count++;
+});
   const topViewed = Object.values(viewCounts).sort((a, b) => b.count - a.count).slice(0, 10);
 
   const dailyData: Record<string, { date: string; views: number; reads: number; registrations: number }> = {};
