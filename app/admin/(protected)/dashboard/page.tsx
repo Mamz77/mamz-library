@@ -41,7 +41,7 @@ const bookCounts: Record<
       author: string;
       cover_url?: string;
       slug: string;
-    } | null;
+    }
   }
 > = {};
 
@@ -50,15 +50,17 @@ const bookCounts: Record<
 
   const book = e.books[0];
 
+  if (!book) return;
+
   if (!bookCounts[e.book_id]) {
     bookCounts[e.book_id] = {
       count: 0,
       book: {
-        id: book?.id || "",
-        title: book?.title || "",
-        author: book?.author || "",
-        cover_url: book?.cover_url,
-        slug: book?.slug || "",
+        id: book.id || "",
+        title: book.title || "",
+        author: book.author || "",
+        cover_url: book.cover_url,
+        slug: book.slug || "",
       },
     };
   }
